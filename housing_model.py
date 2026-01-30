@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[72]:
-
-
 import os
 import tarfile
 import urllib.request  # corrected import
@@ -33,37 +27,16 @@ def load_housing_data(housing_path=HOUSING_PATH):
 # Load and display
 housing = load_housing_data()
 print(housing.head())
-
-
-# In[73]:
-
-
 housing.info()
-
-
-# In[74]:
-
 
 housing["ocean_proximity"].value_counts()
 
-
-# In[75]:
-
-
 housing.describe()
-
-
-# In[76]:
-
 
 get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 housing.hist(bins=50,figsize=(20,15))
 plt.show()
-
-
-# In[77]:
-
 
 #Creating a Test set
 import numpy as np
@@ -74,55 +47,27 @@ def split_train_test(data,test_ratio):
     train_indice =shuffled_indices[test_set_size:]
     return data.iloc[train_indice],data.iloc[test_indice]
 
-
-# In[78]:
-
-
 train_set,test_set = split_train_test(housing,0.2)
 print("length of traineing data = ",len(train_set))
 print("length of test data = ",len(test_set))
 
-
-# In[79]:
-
-
 from zlib import crc32
 def test_set_check(identifier,test_ratio):
     return crc32(np.int64(identifier))& 0xffffffff <test_ratio*2**32
-
-
-# In[80]:
-
 
 def split_train_test_by_id(data,test_ratio,id_column):
     ids = data[id_column]
     in_test_set = ids.apply(lambda id_: test_set_check(id_,test_ratio))
     return data.loc[~in_test_set],data.loc[in_test_set]
 
-
-# In[81]:
-
-
 housing_with_id = housing.reset_index()  #adds an index column
 train_set,test_set = split_train_test_by_id(housing_with_id,0.2,"index")
-
-
-# In[82]:
-
 
 housing_with_id["id"] = housing["longitude"]*1000 + housing["latitude"]
 train_set,test_set = split_train_test_by_id(housing_with_id,0.2,"id")
 
-
-# In[83]:
-
-
 housing["income_cat"] = pd.cut(housing["median_income"],bins=[0,1.5,3,4.5,6.,np.inf],labels=[1,2,3,4,5])
 housing["income_cat"].hist()
-
-
-# In[84]:
-
 
 from sklearn .model_selection import StratifiedShuffleSplit
 split = StratifiedShuffleSplit(n_splits=1,test_size=0.2,random_state=42)
@@ -131,22 +76,10 @@ for train_index,test_index in split.split(housing,housing["income_cat"]):
     strat_test_set = housing.loc[test_index]
 strat_test_set["income_cat"].value_counts()    
 
-
-# In[85]:
-
-
 for set_ in(strat_train_set,strat_test_set):
     set_.drop("income_cat",axis=1,inplace=True)
 
-
-# In[86]:
-
-
 housing = strat_train_set.copy()
-
-
-# In[87]:
-
 
 # Making a scatter plo
 housing.plot(kind="scatter",x="longitude",y="latitude",alpha=0.4,s=housing["population"]/100,label="population",figsize=(10,7),c="median_house_value",cmap=plt.get_cmap("jet"))
@@ -435,10 +368,3 @@ joblib.dump(final_model, "final_model.pkl")
 joblib.dump(full_pipeline, "data_pipeline.pkl")
 
 print("Model and pipeline saved successfully!")
-
-
-# In[ ]:
-
-
-
-
